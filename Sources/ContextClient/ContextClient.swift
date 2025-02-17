@@ -24,10 +24,7 @@ struct Boot {
                 name: "echo",
                 parameters: parameters
             )
-            print(toolResponse)
-            while true {
-                try await Task.sleep(for: .seconds(1_000_000))
-            }
+            print(toolResponse) // "Hello, World!"
         } catch {
             print("Error: \(error)")
         }

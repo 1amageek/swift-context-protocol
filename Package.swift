@@ -5,10 +5,16 @@ import PackageDescription
 
 let package = Package(
     name: "swift-context-protocol",
-    platforms: [.macOS("15.0"), .iOS(.v18), .tvOS(.v18), .watchOS(.v11), .visionOS(.v2)],
+    platforms: [.macOS(.v15), .iOS(.v18), .tvOS(.v18), .watchOS(.v11), .visionOS(.v2)],
     products: [
         .library(
             name: "ContextProtocol",
+            targets: ["ContextProtocol"]),
+        .library(
+            name: "ContextServer",
+            targets: ["ContextProtocol"]),
+        .library(
+            name: "ContextClient",
             targets: ["ContextProtocol"]),
     ],
     dependencies: [
@@ -23,14 +29,14 @@ let package = Package(
                 .product(name: "JSONSchema", package: "swift-json-schema")
             ]
         ),
-        .executableTarget(
+        .target(
             name: "ContextServer",
             dependencies: [
                 "ContextProtocol",
                 .product(name: "WebSocketActors", package: "websocket-actor-system"),
             ]
         ),
-        .executableTarget(
+        .target(
             name: "ContextClient",
             dependencies: [
                 "ContextProtocol",
