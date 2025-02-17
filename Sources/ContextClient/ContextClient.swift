@@ -49,6 +49,20 @@ public final class ContextClient: @unchecked Sendable {
         let system = WebSocketActorSystem()
         try await system.connectClient(to: address)
         self.session = try $ContextProtocol.resolve(id: .client, using: system)
+        
+        let clientInfo = ClientInfo(name: "Context Client", version: "1.0")
+        let capabilities: [String: CapabilityConfig] = [:]
+        let initResponse = try await session.initialize(clientInfo: clientInfo,
+                                                        capabilities: capabilities)
+        print("""
+            ══════════════════════════════════════════════════
+
+             ✨ Server Connected ✨ 
+             Server: \(initResponse.serverInfo.name) [\(initResponse.serverInfo.version)]     
+             Instructions: \(initResponse.instructions ?? "None")  
+
+            ══════════════════════════════════════════════════
+            """)
     }
     
     public static func connectServer(host: String = "127.0.0.1", port: Int = 8888) async throws -> ContextClient {

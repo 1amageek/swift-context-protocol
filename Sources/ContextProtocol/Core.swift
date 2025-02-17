@@ -176,42 +176,38 @@ public enum ToolError: Error {
     }
 }
 
-/// A protocol representing a language model (LLM), which extends the `Step` protocol.
-///
-/// `Model` defines a system prompt and can utilize a set of tools to assist in its operations.
-public protocol Model: Step {
-    
-    /// The system prompt used by the model.
-    ///
-    /// - Note: This prompt serves as the base context for the model's behavior.
-    var systemPrompt: String { get }
-    
-    /// A collection of tools available to the model for assisting in its operations.
-    ///
-    /// - Note: Tools can be used by the model to perform specialized tasks.
-    var tools: [any Tool] { get }
-}
-
 /// Resource プロトコル
 /// - リソースは名前、URI、説明、および読み出しメソッドを提供します。
-public protocol Resource: Identifiable, Step, Sendable {
+public protocol Resource: Identifiable, Step, Sendable where Input == ResourceReference, Output == ResourceContentData {
+    
+    associatedtype Input = ResourceReference
+    
+    associatedtype Output = ResourceContentData
     /// リソースの一意な名前
     var name: String { get }
 
     /// リソースを識別する URI
     var uri: URL { get }
+    
+    var mimeType: String { get }
 
     /// リソースの説明（任意）
-    var description: String? { get }
+    var description: String { get }
+}
+
+public struct ResourceReference: Codable, Sendable {
+    public var uri: URL
+    public var mimeType: String?
 }
 
 extension Resource {
     
-    public var id: String { name }
+    public var id: String { "\(name):\(uri)" }
     
     /// リソースの内容を読み出す
-    func read() async throws -> String {
-        return ""
+    public func read() async throws -> Output {
+        let source = ResourceReference(uri: uri, mimeType: mimeType)
+        return try await run(source)
     }
 }
 
@@ -222,7 +218,7 @@ public protocol Prompt: Identifiable, Step, Sendable where Input: Codable, Outpu
     var name: String { get }
 
     /// プロンプトの説明（任意）
-    var description: String? { get }
+    var description: String { get }
 }
 
 extension Prompt {

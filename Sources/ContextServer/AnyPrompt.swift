@@ -17,7 +17,7 @@ public struct AnyPrompt<Input: Codable & Sendable, Output: Codable & Sendable & 
     public let name: String
     
     /// An optional description of the prompt.
-    public let description: String?
+    public let description: String
     
     /// A handler that generates a prompt string based on the provided input.
     public let handler: @Sendable (Input) async throws -> Output
@@ -29,7 +29,7 @@ public struct AnyPrompt<Input: Codable & Sendable, Output: Codable & Sendable & 
     ///   - handler: A closure that defines how to generate the prompt.
     public init(
         name: String,
-        description: String? = nil,
+        description: String,
         handler: @escaping @Sendable (Input) async throws -> Output
     ) {
         self.name = name

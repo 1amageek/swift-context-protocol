@@ -143,16 +143,78 @@ public distributed actor ContextActor {
 
 extension ContextActor: ContextProtocol {
     
-    public distributed func listTools(option: RequestOptions?) -> ListResponse<ToolResponse> {
-        let tools = self.tools.map { (name, tool) in
-            return ToolResponse(
-                name: tool.name,
-                description: tool.description,
-                inputSchema: tool.inputSchema,
-                guide: tool.guide
-            )
+    public distributed func initialize(clientInfo: ClientInfo,
+                                       capabilities: [String: CapabilityConfig],
+                                       options: RequestOptions?) async throws -> InitializeResponse {
+        // サーバー側の情報および capability を固定値として返す例
+        let serverInfo = ServerInfo(name: "ContextActor", version: "1.0")
+        let serverCapabilities: [String: CapabilityConfig] = [
+            "tools": CapabilityConfig(settings: ["call": "true", "list": "true"]),
+            "resources": CapabilityConfig(settings: ["read": "true", "subscribe": "true"]),
+            "prompts": CapabilityConfig(settings: ["execute": "true", "list": "true"])
+        ]
+        let instructions = "This is a distributed context actor providing MCP services."
+        return InitializeResponse(protocolVersion: "1.0",
+                                  serverInfo: serverInfo,
+                                  capabilities: serverCapabilities,
+                                  instructions: instructions)
+    }
+    
+    public distributed func ping(option: RequestOptions?) -> String {
+        return "pong"
+    }
+    
+    public distributed func complete(parameters: Data, options: RequestOptions?) async throws -> String {
+        if let input = String(data: parameters, encoding: .utf8) {
+            return "completed: \(input)"
         }
-        return .init(results: tools)
+        return "completed"
+    }
+    
+    public distributed func setLoggingLevel(level: LoggingLevel, options: RequestOptions?) async throws -> Void {
+        print("Logging level set to \(level.rawValue)")
+    }
+    
+    public distributed func getPrompt(parameters: Data, options: RequestOptions?) async throws -> String {
+        if let input = String(data: parameters, encoding: .utf8) {
+            return "Prompt for \(input)"
+        }
+        return "Default prompt"
+    }
+    
+    public distributed func listPrompts(option: RequestOptions?) -> ListResponse<PromptResponse> {
+        let promptsArray = self.prompts.map { (_, prompt) in
+            PromptResponse(name: prompt.name,
+                           description: prompt.description,
+                           parameters: nil,
+                           guide: nil)
+        }
+        return ListResponse(results: Array(promptsArray))
+    }
+    
+    public distributed func listResources(option: RequestOptions?) -> ListResponse<ResourceResponse> {
+        let resourcesArray = self.resources.map { (_, resource) in
+            ResourceResponse(uri: resource.uri.absoluteString,
+                             name: resource.name,
+                             description: resource.description ,
+                             mimeType: resource.mimeType)
+        }
+        return ListResponse(results: Array(resourcesArray))
+    }
+    
+    public distributed func readResource(uri: String, options: RequestOptions?) async throws -> ResourceContentData {
+        guard let resource = self.resources.first(where: { $0.value.uri.absoluteString == uri })?.value else {
+            throw NSError(domain: "ContextActor", code: 404, userInfo: [NSLocalizedDescriptionKey: "Resource not found"])
+        }
+        return try await resource.read()
+    }
+    
+    public distributed func subscribeResource(uri: String, options: RequestOptions?) async throws -> Void {
+        print("Subscribed to resource: \(uri)")
+    }
+    
+    public distributed func unsubscribeResource(uri: String, options: RequestOptions?) async throws -> Void {
+        print("Unsubscribed from resource: \(uri)")
     }
     
     public distributed func callTool(name: String, parameters: Data, options: RequestOptions?) async throws -> String {
@@ -168,8 +230,17 @@ extension ContextActor: ContextProtocol {
         }
     }
     
-    public distributed func ping(option: RequestOptions?) -> String {
-        return "pong"
+    public distributed func listTools(option: RequestOptions?) -> ListResponse<ToolResponse> {
+        let toolsArray = self.tools.map { (_, tool) in
+            ToolResponse(name: tool.name,
+                         description: tool.description,
+                         inputSchema: tool.inputSchema,
+                         guide: tool.guide)
+        }
+        return ListResponse(results: Array(toolsArray))
+    }
+    
+    public distributed func sendRootsListChanged(options: RequestOptions?) async throws -> Void {
+        print("Roots list changed notification sent")
     }
 }
-

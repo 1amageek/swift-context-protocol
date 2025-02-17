@@ -11,9 +11,18 @@ import ContextProtocol
 
 public final class ContextServer {
     
+    public struct Options: Codable {
+        public var instructions: String
+        public init(instructions: String) {
+            self.instructions = instructions
+        }
+    }
+    
     let system: WebSocketActorSystem
     
     let address: ServerAddress
+    
+    let options: Options
     
     private var tools: [any Tool] = []
     
@@ -24,11 +33,13 @@ public final class ContextServer {
     public init(
         host: String = "127.0.0.1",
         port: Int = 8888,
+        options: Options = Options(instructions: "Welcome to Context Server"),
         tools: [any Tool] = [],
         resources: [any Resource] = [],
         prompts: [any Prompt] = []
     ) {
         self.system = WebSocketActorSystem(id: .server)
+        self.options = options
         self.address = ServerAddress(
             scheme: .insecure,
             host: host,

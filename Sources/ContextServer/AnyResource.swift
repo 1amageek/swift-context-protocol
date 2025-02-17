@@ -12,7 +12,11 @@ import JSONSchema
 
 /// A type-erased resource that conforms to the `Resource` protocol.
 /// It accepts a generic input and produces a generic output asynchronously.
-public struct AnyResource<Input: Codable & Sendable, Output: Codable & Sendable & CustomStringConvertible>: Resource {
+public struct AnyResource {
+    
+    public typealias Input = ResourceReference
+    
+    public typealias Output = ResourceContentData
     
     /// A unique name for the resource.
     public let name: String
@@ -20,8 +24,10 @@ public struct AnyResource<Input: Codable & Sendable, Output: Codable & Sendable 
     /// The URI that identifies the resource.
     public let uri: URL
     
+    public var mimeType: String
+    
     /// An optional description of the resource.
-    public let description: String?
+    public let description: String
     
     /// A handler that performs the resource’s operation.
     public let handler: @Sendable (Input) async throws -> Output
@@ -35,11 +41,13 @@ public struct AnyResource<Input: Codable & Sendable, Output: Codable & Sendable 
     public init(
         name: String,
         uri: URL,
-        description: String? = nil,
+        mimeType: String,
+        description: String,
         handler: @escaping @Sendable (Input) async throws -> Output
     ) {
         self.name = name
         self.uri = uri
+        self.mimeType = mimeType
         self.description = description
         self.handler = handler
     }
@@ -47,7 +55,7 @@ public struct AnyResource<Input: Codable & Sendable, Output: Codable & Sendable 
     /// Executes the resource operation with the provided input.
     /// - Parameter input: The input required by the resource.
     /// - Returns: The output produced by the resource.
-    public func run(_ input: Input) async throws -> Output {
+    public func run(_ input: ResourceReference) async throws -> ResourceContentData {
         try await handler(input)
     }
     
