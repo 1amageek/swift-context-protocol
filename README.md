@@ -1,6 +1,6 @@
 # swift-context-protocol
 
-[![Swift Version](https://img.shields.io/badge/Swift-5.5%2B-blue.svg)](https://swift.org)
+[![Swift Version](https://img.shields.io/badge/Swift-6.0%2B-blue.svg)](https://swift.org)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 _A distributed context protocol implementation for Swift._
