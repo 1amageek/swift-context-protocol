@@ -5,7 +5,7 @@
 
 _A distributed context protocol implementation for Swift._
 
-swift-context-protocol provides a standardized distributed actor interface for working with tools, resources, and prompts in a distributed environment. Using Swift's distributed actor model and a WebSocket-based actor system, this package enables you to define and register various processing components—such as tools that perform operations, resources that can be read, and prompts that generate templated outputs—in a type-safe and scalable manner.
+swift-context-protocol is a Swift-based implementation of the Model Context Protocol (MCP) for AI contexts. It leverages Swift’s distributed actor model to enable type-safe, asynchronous remote invocation of tools, resources, and prompts.
 
 ## Features
 
