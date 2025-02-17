@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "swift-context-protocol",
-    platforms: [.macOS("15.0")],
+    platforms: [.macOS("15.0"), .iOS(.v18), .tvOS(.v18), .watchOS(.v11), .visionOS(.v2)],
     products: [
         .library(
             name: "ContextProtocol",

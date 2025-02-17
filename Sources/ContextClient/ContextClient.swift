@@ -16,17 +16,20 @@ struct Boot {
     
     static func main() async throws {
 
-        let server = try await ContextClient.connectServer()
-        let data = Envelop(data: "Hello, World!")
-        let parameters = try JSONEncoder().encode(data)
-        let toolResponse = try await server.session.callTool(
-            name: "echo",
-            parameters: parameters
-        )
-        print(toolResponse)
-        
-        while true {
-            try await Task.sleep(for: .seconds(1_000_000))
+        do {
+            let server = try await ContextClient.connectServer()
+            let data = Envelop(data: "Hello, World!")
+            let parameters = try JSONEncoder().encode(data)
+            let toolResponse = try await server.session.callTool(
+                name: "echo",
+                parameters: parameters
+            )
+            print(toolResponse)
+            while true {
+                try await Task.sleep(for: .seconds(1_000_000))
+            }
+        } catch {
+            print("Error: \(error)")
         }
     }
 }
