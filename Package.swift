@@ -12,10 +12,10 @@ let package = Package(
             targets: ["ContextProtocol"]),
         .library(
             name: "ContextServer",
-            targets: ["ContextProtocol"]),
+            targets: ["ContextServer"]),
         .library(
             name: "ContextClient",
-            targets: ["ContextProtocol"]),
+            targets: ["ContextClient"]),
     ],
     dependencies: [
         .package(url: "https://github.com/samalone/websocket-actor-system.git", branch: "main"),
